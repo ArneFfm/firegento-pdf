@@ -54,6 +54,15 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </engine>
+                        <title translate="label">
+                            <label>Invoice Title</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>1</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends><engine>firegento_pdf/engine_invoice_german</engine></depends>
+                        </title>
                         <show_customer_number translate="label">
                             <label>Show Customer Number</label>
                             <frontend_type>select</frontend_type>

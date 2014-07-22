@@ -128,11 +128,15 @@ class FireGento_Pdf_Model_Engine_Invoice_German extends FireGento_Pdf_Model_Engi
             }
             $page  = $this->newPage();
             $order = $invoice->getOrder();
+
+            /* Add Title */
+            $this->insertTitle($page, $invoice->getStore());
             /* Add image */
-            $this->insertLogo($page, $invoice->getStore());
-            /* Add address */
             $this->insertAddress($page, $invoice->getStore());
             /* Add head */
+            $this->insertLogo($page, $invoice->getStore());
+            /* Add address */
+
             $this->insertOrder(
                 $page,
                 $order,
