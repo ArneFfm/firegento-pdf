@@ -31,9 +31,17 @@
  * @version   $Id:$
  * @since     0.1.0
  */
-class FireGento_Pdf_Model_Engine_Invoice_German extends FireGento_Pdf_Model_Engine_Abstract_Default
+class FireGento_Pdf_Model_Engine_Invoice_German extends FireGento_Pdf_Model_Engine_AbstractDefault
 {
 
+    /**
+     * constructor to set mode to invoice
+     */
+    public function __construct()
+    {
+        parent::__construct();
+        $this->setMode('invoice');
+    }
     /**
      * Draw header for item table
      *
