@@ -30,6 +30,9 @@
             <tax>
                 <rewrite>
                     <sales_pdf_grandtotal>FireGento_Pdf_Model_Tax_Sales_Pdf_Grandtotal</sales_pdf_grandtotal>
+                    <sales_pdf_tax>Firegento_Pdf_Model_Tax_Sales_Pdf_Tax</sales_pdf_tax>
+                    <sales_pdf_shipping>Firegento_Pdf_Model_Tax_Sales_Pdf_Shipping</sales_pdf_shipping>
+                    <sales_pdf_subtotal>Firegento_Pdf_Model_Tax_Sales_Pdf_Subtotal</sales_pdf_subtotal>
                 </rewrite>
             </tax>
         </models>
