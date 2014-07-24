@@ -59,6 +59,7 @@ class FireGento_Pdf_Model_Invoice
          */
         $storeId = $invoices[0]->getStore();
 
+
         if (!$this->_engine) {
             $modelClass = Mage::getStoreConfig('sales_pdf/invoice/engine', $storeId);
             $engine = Mage::getModel($modelClass);
