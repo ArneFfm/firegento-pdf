@@ -72,13 +72,6 @@
                 <tax>
                     <sort_order>650</sort_order>
                 </tax>
-                <shipping_excl_tax translate="title">
-                    <title>Shipping</title>
-                    <source_field>shipping_excl_tax</source_field>
-                    <font_size>8</font_size>
-                    <display_zero>1</display_zero>
-                    <sort_order>700</sort_order>
-                </shipping_excl_tax>
             </totals>
         </pdf>
     </global>

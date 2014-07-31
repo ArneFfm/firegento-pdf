@@ -91,3 +91,6 @@
 "Mage_Sales::Shipping","Versandkosten"
 "Mage_Sales::Tax","Umsatzsteuer"
 "Mage_Tax::Tax","Umsatzsteuer"
+"P.O. Box:","Postfach:"
+"Registered seat:","Sitz:"
+"Register court:","Amtsgericht:"

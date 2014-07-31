@@ -759,8 +759,24 @@ abstract class FireGento_Pdf_Model_Engine_Abstract extends Mage_Sales_Model_Orde
                 }
             }
         }
+        if (Mage::getStoreConfig('sales_pdf/invoice/full_customizable_totals',$source->getStore())) {
+            $lineBlock = $this->_modifyTotalsDesign($lineBlock, $source);
+        }
         $page = $this->drawLineBlocks($page, array($lineBlock));
         return $page;
+    }
+
+    /**
+     * @param $lineblock
+     * @param $source
+     * @return mixed
+     */
+    protected function _modifyTotalsDesign($lineblock, $source) {
+
+        if (Mage::getStoreConfig('sales_pdf/invoice/show_tax_rate_in_tax_total',$source->getStore())) {
+            $a = $lineblock;
+        }
+        return $lineblock;
     }
 
     /**
@@ -825,6 +841,9 @@ abstract class FireGento_Pdf_Model_Engine_Abstract extends Mage_Sales_Model_Orde
         // get the imprint of the store if a store is set
         if (!empty($store)) {
             $this->_imprint = Mage::getStoreConfig('general/imprint', $store);
+            if (Mage::getStoreConfig('sales_pdf/invoice/modify_footer', $store)) {
+                $this->_modFooter($store);
+            }
         }
 
         // Add footer if GermanSetup is installed.
@@ -835,6 +854,18 @@ abstract class FireGento_Pdf_Model_Engine_Abstract extends Mage_Sales_Model_Orde
             // Add page counter.
             $this->y = 110;
             $this->_insertPageCounter($page);
+        }
+    }
+
+    /**
+     * @param $store
+     */
+    protected function _modFooter($store) {
+        foreach ($this->_imprint as $imprintItemKey => $imprintItemValue) {
+           if (!empty(Mage::getStoreConfig('sales_pdf/invoice/footer_'. $imprintItemKey))) {
+               $this->_imprint[$imprintItemKey] = Mage::getStoreConfig('sales_pdf/invoice/footer_'. $imprintItemKey);
+           }
+
         }
     }
 
@@ -876,7 +907,9 @@ abstract class FireGento_Pdf_Model_Engine_Abstract extends Mage_Sales_Model_Orde
             'tax_number'      => Mage::helper('firegento_pdf')->__('Tax number:'),
             'vat_id'          => Mage::helper('firegento_pdf')->__('VAT-ID:'),
             'register_number' => Mage::helper('firegento_pdf')->__('Register number:'),
-            'ceo'             => Mage::helper('firegento_pdf')->__('CEO:')
+            'ceo'             => Mage::helper('firegento_pdf')->__('CEO:'),
+            'city'            => Mage::helper('firegento_pdf')->__('Registered seat:'),
+            'court'           => Mage::helper('firegento_pdf')->__('Register court:')
         );
         $this->_insertFooterBlock($page, $fields, 355, 60, $this->margin['right'] - 365 - 10);
     }
@@ -949,6 +982,7 @@ abstract class FireGento_Pdf_Model_Engine_Abstract extends Mage_Sales_Model_Orde
         }
 
         $address .= $this->_imprint['street'] . "\n";
+        $address .= 'Postfach: ' . $this->_imprint['pobox'] . "\n";
         $address .= $this->_imprint['zip'] . " ";
         $address .= $this->_imprint['city'] . "\n";
 
