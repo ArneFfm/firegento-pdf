@@ -66,7 +66,7 @@ class FireGento_Pdf_Model_Tax_Sales_Pdf_Grandtotal extends Mage_Tax_Model_Sales_
         $totals = array(array(
             'amount' => $this->getAmountPrefix() . $amountExclTax,
             'label' => Mage::helper('tax')->__('Grand Total (Excl. Tax)') . ':',
-            'font_size' => $fontSize
+            'font_size'  => $fontSize
         ));
 
         /**
