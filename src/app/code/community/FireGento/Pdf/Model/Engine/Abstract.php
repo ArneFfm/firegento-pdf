@@ -763,40 +763,10 @@ abstract class FireGento_Pdf_Model_Engine_Abstract extends Mage_Sales_Model_Orde
                 }
             }
         }
-        if (Mage::getStoreConfig('sales_pdf/invoice/full_customizable_totals',$source->getStore())) {
-            $lineBlock = $this->_modifyTotalsDesign($lineBlock, $source);
-        }
         $page = $this->drawLineBlocks($page, array($lineBlock));
 
         $newShippingConfig = Mage::app()->getStore($source->getStore())->setConfig('tax/sales_display/shipping', $oldShippingConfig);
         return $page;
-    }
-
-    /**
-     * ToDo: Change this crap
-     * @param $lineblock
-     * @param $source
-     * @return mixed
-     */
-    protected function _modifyTotalsDesign($lineblock, $source) {
-
-        if (Mage::getStoreConfig('sales_pdf/invoice/show_tax_rate_in_tax_total',$source->getStore())) {
-            $a = $lineblock;
-            foreach ($lineblock as $lines) {
-                foreach ($lines as $line) {
-                    foreach ($line as $entry) {
-                        if ($entry['text'] == 'Umsatzsteuer:') {
-                            $rawTax = Mage::getSingleton('tax/calculation_rate')->loadByCode($taxCode);
-                            $taxRate = $rawTax->getData('rate');
-
-                            $taxRate = Mage::getSingleton('tax/calculation_rate');
-                            $entry['text'] = 'Umsatzsteuer';
-                        }
-                    }
-                }
-            }
-        }
-        return $lineblock;
     }
 
     /**
