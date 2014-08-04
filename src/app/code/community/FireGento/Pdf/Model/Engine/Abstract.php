@@ -490,6 +490,7 @@ abstract class FireGento_Pdf_Model_Engine_Abstract extends Mage_Sales_Model_Orde
 
         // Customer IP
         if (!Mage::getStoreConfigFlag('sales/general/hide_customer_ip', $order->getStoreId())) {
+            if (!Mage::getStoreConfigFlag('sales_pdf/invoice/show_ip_number')) {
             $page->drawText(
                 Mage::helper('firegento_pdf')->__('Customer IP:'), ($this->margin['right'] - $labelRightOffset),
                 $this->y, $this->encoding
@@ -503,6 +504,7 @@ abstract class FireGento_Pdf_Model_Engine_Abstract extends Mage_Sales_Model_Orde
             );
             $this->Ln();
             $numberOfLines++;
+            }
         }
 
         $page->drawText(
@@ -725,6 +727,8 @@ abstract class FireGento_Pdf_Model_Engine_Abstract extends Mage_Sales_Model_Orde
                 }
             }
         }
+        $oldShippingConfig = Mage::getStoreConfig('tax/sales_display/shipping', $source->getStore());
+        $newShippingConfig = Mage::app()->getStore($source->getStore())->setConfig('tax/sales_display/shipping', 1);
 
         $totals = $this->_getTotalsList($source);
 
@@ -763,10 +767,13 @@ abstract class FireGento_Pdf_Model_Engine_Abstract extends Mage_Sales_Model_Orde
             $lineBlock = $this->_modifyTotalsDesign($lineBlock, $source);
         }
         $page = $this->drawLineBlocks($page, array($lineBlock));
+
+        $newShippingConfig = Mage::app()->getStore($source->getStore())->setConfig('tax/sales_display/shipping', $oldShippingConfig);
         return $page;
     }
 
     /**
+     * ToDo: Change this crap
      * @param $lineblock
      * @param $source
      * @return mixed
@@ -775,6 +782,19 @@ abstract class FireGento_Pdf_Model_Engine_Abstract extends Mage_Sales_Model_Orde
 
         if (Mage::getStoreConfig('sales_pdf/invoice/show_tax_rate_in_tax_total',$source->getStore())) {
             $a = $lineblock;
+            foreach ($lineblock as $lines) {
+                foreach ($lines as $line) {
+                    foreach ($line as $entry) {
+                        if ($entry['text'] == 'Umsatzsteuer:') {
+                            $rawTax = Mage::getSingleton('tax/calculation_rate')->loadByCode($taxCode);
+                            $taxRate = $rawTax->getData('rate');
+
+                            $taxRate = Mage::getSingleton('tax/calculation_rate');
+                            $entry['text'] = 'Umsatzsteuer';
+                        }
+                    }
+                }
+            }
         }
         return $lineblock;
     }
@@ -840,7 +860,12 @@ abstract class FireGento_Pdf_Model_Engine_Abstract extends Mage_Sales_Model_Orde
     {
         // get the imprint of the store if a store is set
         if (!empty($store)) {
-            $this->_imprint = Mage::getStoreConfig('general/imprint', $store);
+            $this->_imprint = explode(',', Mage::getStoreConfig('sales_pdf/invoice/footer_imprint', $store));
+            foreach ($this->_imprint as $imprintKey => $imprintValue) {
+                $this->_imprint[$imprintValue] = $this->_imprint[$imprintKey];
+                unset($this->_imprint[$imprintKey]);
+                $this->_imprint[$imprintValue] = Mage::getStoreConfig('general/imprint/'.$imprintValue, $store);
+            }
             if (Mage::getStoreConfig('sales_pdf/invoice/modify_footer', $store)) {
                 $this->_modFooter($store);
             }
@@ -970,19 +995,22 @@ abstract class FireGento_Pdf_Model_Engine_Abstract extends Mage_Sales_Model_Orde
         $font = $this->_setFontRegular($page, $fontSize);
         $y = $this->y;
         $address = '';
-
+        if (array_key_exists('shop_name', $this->_imprint)) {
+            foreach ($this->_prepareText($this->_imprint['shop_name'], $page, $font, $fontSize, 90) as $shopName) {
+                $address .= $shopName . "\n";
+            }
+        }
+        if (array_key_exists('company_first', $this->_imprint)) {
         foreach ($this->_prepareText($this->_imprint['company_first'], $page, $font, $fontSize, 90) as $companyFirst) {
             $address .= $companyFirst . "\n";
         }
-
+        }
         if (array_key_exists('company_second', $this->_imprint)) {
             foreach ($this->_prepareText($this->_imprint['company_second'], $page, $font, $fontSize, 90) as $companySecond) {
                 $address .= $companySecond . "\n";
             }
         }
-
         $address .= $this->_imprint['street'] . "\n";
-        $address .= 'Postfach: ' . $this->_imprint['pobox'] . "\n";
         $address .= $this->_imprint['zip'] . " ";
         $address .= $this->_imprint['city'] . "\n";
 

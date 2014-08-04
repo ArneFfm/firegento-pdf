@@ -66,7 +66,7 @@ class FireGento_Pdf_Model_Tax_Sales_Pdf_Grandtotal extends Mage_Tax_Model_Sales_
         $totals = array(array(
             'amount' => $this->getAmountPrefix() . $amountExclTax,
             'label' => Mage::helper('tax')->__('Grand Total (Excl. Tax)') . ':',
-            'font_size' => $fontSize
+            'font_size'  => $fontSize
         ));
 
         /**
@@ -76,7 +76,8 @@ class FireGento_Pdf_Model_Tax_Sales_Pdf_Grandtotal extends Mage_Tax_Model_Sales_
          * else display only tax total
          */
         if ($config->displaySalesFullSummary($store)) {
-            $totals = array_merge($totals, $this->getFullTaxInfo());
+            $modFullTaxInfo = $this->modFullTaxInfo($this->getFullTaxInfo());
+            $totals = array_merge($totals, $modFullTaxInfo);
             if (!$noDisplaySumOnDetails) {
                 $totals[] = array(
                     'amount' => $this->getAmountPrefix() . $tax,
@@ -98,5 +99,23 @@ class FireGento_Pdf_Model_Tax_Sales_Pdf_Grandtotal extends Mage_Tax_Model_Sales_
             'font_size' => $fontSize
         );
         return $totals;
+    }
+
+    protected function modFullTaxInfo($fullTaxinfo) {
+        foreach ($fullTaxinfo as $singleTaxInfoKey => $singleTaxInfoValue) {
+            $numberDigits = Mage::getStoreConfig('sales_pdf/invoice/number_of_tax_rate_digits_to_display');
+            if ($numberDigits || $numberDigits == 0 && preg_match_all('!\d+(?:\.\d+)?!', $singleTaxInfoValue['label'], $matches)) {
+                $number = preg_match_all('!\d+(?:\.\d+)?!', $singleTaxInfoValue['label'], $matches);
+                $floats = array_map('floatval', $matches[0]);
+                $formatedNumber = number_format($number, Mage::getStoreConfig('sales_pdf/invoice/number_of_tax_rate_digits_to_display'));
+                foreach ($matches as $foundFloats) {
+                    foreach ($foundFloats as $float) {
+                    $fullTaxinfo[$singleTaxInfoKey]['label'] = str_replace($float, $floats[key($foundFloats)], $singleTaxInfoValue['label']);
+
+                    }
+                }
+            }
+        }
+        return $fullTaxinfo;
     }
 }
