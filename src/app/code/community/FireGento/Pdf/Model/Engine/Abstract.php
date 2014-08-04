@@ -887,7 +887,7 @@ abstract class FireGento_Pdf_Model_Engine_Abstract extends Mage_Sales_Model_Orde
      */
     protected function _modFooter($store) {
         foreach ($this->_imprint as $imprintItemKey => $imprintItemValue) {
-           if (!empty(Mage::getStoreConfig('sales_pdf/invoice/footer_'. $imprintItemKey))) {
+           if (!Mage::getStoreConfig('sales_pdf/invoice/footer_'. $imprintItemKey)) {
                $this->_imprint[$imprintItemKey] = Mage::getStoreConfig('sales_pdf/invoice/footer_'. $imprintItemKey);
            }
 
