@@ -490,7 +490,7 @@ abstract class FireGento_Pdf_Model_Engine_Abstract extends Mage_Sales_Model_Orde
 
         // Customer IP
         if (!Mage::getStoreConfigFlag('sales/general/hide_customer_ip', $order->getStoreId())) {
-            if (!Mage::getStoreConfigFlag('sales_pdf/invoice/show_ip_number')) {
+            if (Mage::getStoreConfigFlag('sales_pdf/invoice/show_ip_number')) {
             $page->drawText(
                 Mage::helper('firegento_pdf')->__('Customer IP:'), ($this->margin['right'] - $labelRightOffset),
                 $this->y, $this->encoding
@@ -980,9 +980,15 @@ abstract class FireGento_Pdf_Model_Engine_Abstract extends Mage_Sales_Model_Orde
                 $address .= $companySecond . "\n";
             }
         }
-        $address .= $this->_imprint['street'] . "\n";
-        $address .= $this->_imprint['zip'] . " ";
-        $address .= $this->_imprint['city'] . "\n";
+        if (array_key_exists('street', $this->_imprint)) {
+            $address .= $this->_imprint['street'] . "\n";
+        }
+        if (array_key_exists('zip', $this->_imprint)) {
+            $address .= $this->_imprint['zip'] . " ";
+        }
+        if (array_key_exists('city', $this->_imprint)) {
+            $address .= $this->_imprint['city'] . "\n";
+        }
 
         if (array_key_exists('country', $this->_imprint)) {
             $countryName = Mage::getModel('directory/country')->loadByCode($this->_imprint['country'])->getName();
