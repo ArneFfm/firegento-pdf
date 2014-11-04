@@ -33,7 +33,6 @@ class FireGento_Pdf_Model_Tax_Sales_Pdf_Grandtotal extends Mage_Tax_Model_Sales_
 {
 
     const NO_SUM_ON_DETAILS = 'tax/sales_display/no_sum_on_details';
-    const FULL_CUSTOMIZABLE_TOTALS= 'sales_pdf/invoice/full_customizable_totals';
 
     /**
      * Check if tax amount should be included to grandtotals block
@@ -52,7 +51,6 @@ class FireGento_Pdf_Model_Tax_Sales_Pdf_Grandtotal extends Mage_Tax_Model_Sales_
         $store = $this->getOrder()->getStore();
         $config = Mage::getSingleton('tax/config');
         $noDisplaySumOnDetails = Mage::getStoreConfig(self::NO_SUM_ON_DETAILS, $store);
-        $fullCustomizableTotals =  Mage::getStoreConfig(self::FULL_CUSTOMIZABLE_TOTALS, $store);
         if (!$config->displaySalesTaxWithGrandTotal($store)) {
             return parent::getTotalsForDisplay();
         }
