@@ -405,11 +405,17 @@ abstract class FireGento_Pdf_Model_Engine_Abstract extends Mage_Sales_Model_Orde
         $this->_setFontBold($page, 15);
 
         if ($mode == 'invoice') {
-            $title = 'Invoice';
+            if (is_null($title = Mage::getStoreConfig('sales_pdf/invoice/title'))) {
+                $title = 'Invoice';
+            }
         } elseif ($mode == 'shipment') {
-            $title = 'Shipment';
+            if (is_null($title = Mage::getStoreConfig('sales_pdf/shipment/title'))) {
+                $title = 'Shipment';
+            }
         } else {
-            $title = 'Creditmemo';
+            if (is_null($title = Mage::getStoreConfig('sales_pdf/creditmemo/title'))) {
+                $title = 'Creditmemo';
+            }
         }
         $page->drawText(Mage::helper('firegento_pdf')->__($title), $this->margin['left'], $this->y, $this->encoding);
 
@@ -437,12 +443,24 @@ abstract class FireGento_Pdf_Model_Engine_Abstract extends Mage_Sales_Model_Orde
             $this->encoding
         );
 
+        $customMarginInvoiceDetails = Mage::getStoreConfig('sales_pdf/invoice/margin_invoice_details');
+        $customMarginWidthInvoiceDetails = Mage::getStoreConfig('sales_pdf/invoice/margin_width_invoice_details');
+
         $incrementId = $document->getIncrementId();
-        $page->drawText(
-            $incrementId,
-            ($this->margin['right'] - $valueRightOffset - $this->widthForStringUsingFontSize($incrementId, $font, 10)),
-            $this->y, $this->encoding
-        );
+        if ($customMarginInvoiceDetails) {
+            $page->drawText(
+                $incrementId,
+                ($this->margin['right'] - $valueRightOffset - $customMarginWidthInvoiceDetails),
+                $this->y, $this->encoding
+            );
+        }
+        else {
+            $page->drawText(
+                $incrementId,
+                ($this->margin['right'] - $valueRightOffset - $this->widthForStringUsingFontSize($incrementId, $font, 10)),
+                $this->y, $this->encoding
+            );
+        }
         $this->Ln();
         $numberOfLines++;
 
@@ -453,11 +471,17 @@ abstract class FireGento_Pdf_Model_Engine_Abstract extends Mage_Sales_Model_Orde
                 Mage::helper('firegento_pdf')->__('Order number:'), ($this->margin['right'] - $labelRightOffset),
                 $this->y, $this->encoding
             );
-            $page->drawText(
-                $putOrderId, ($this->margin['right'] - $valueRightOffset - $this->widthForStringUsingFontSize(
-                        $putOrderId, $font, 10
-                    )), $this->y, $this->encoding
-            );
+            if ($customMarginInvoiceDetails) {
+                $page->drawText(
+                    $putOrderId, ($this->margin['right'] - $valueRightOffset - $customMarginWidthInvoiceDetails), $this->y, $this->encoding
+                );
+            } else {
+                $page->drawText(
+                    $putOrderId, ($this->margin['right'] - $valueRightOffset - $this->widthForStringUsingFontSize(
+                            $putOrderId, $font, 10
+                        )), $this->y, $this->encoding
+                );
+            }
             $this->Ln();
             $numberOfLines++;
         }
@@ -477,12 +501,21 @@ abstract class FireGento_Pdf_Model_Engine_Abstract extends Mage_Sales_Model_Orde
                 } else {
                     $customerid = $order->getCustomerId();
                 }
-
-                $page->drawText($customerid, ($this->margin['right'] - $valueRightOffset - $this->widthForStringUsingFontSize($customerid, $font, 10)), $this->y, $this->encoding);
+                if ($customMarginInvoiceDetails) {
+                    $page->drawText($customerid, ($this->margin['right'] - $valueRightOffset - $customMarginWidthInvoiceDetails), $this->y, $this->encoding);
+                }
+                else {
+                    $page->drawText($customerid, ($this->margin['right'] - $valueRightOffset - $this->widthForStringUsingFontSize($customerid, $font, 10)), $this->y, $this->encoding);
+                }
                 $this->Ln();
                 $numberOfLines++;
             } else {
-                $page->drawText('-', ($this->margin['right'] - $valueRightOffset - $this->widthForStringUsingFontSize('-', $font, 10)), $this->y, $this->encoding);
+                if ($customMarginInvoiceDetails) {
+                    $page->drawText('-', ($this->margin['right'] - $valueRightOffset - $customMarginWidthInvoiceDetails), $this->y, $this->encoding);
+                }
+                else {
+                    $page->drawText('-', ($this->margin['right'] - $valueRightOffset - $this->widthForStringUsingFontSize('-', $font, 10)), $this->y, $this->encoding);
+                }
                 $this->Ln();
                 $numberOfLines++;
             }
@@ -497,11 +530,18 @@ abstract class FireGento_Pdf_Model_Engine_Abstract extends Mage_Sales_Model_Orde
             );
             $customerIP = $order->getData('remote_ip');
             $font = $this->_setFontRegular($page, 10);
-            $page->drawText(
-                $customerIP, ($this->margin['right'] - $valueRightOffset - $this->widthForStringUsingFontSize(
-                        $customerIP, $font, 10
-                    )), $this->y, $this->encoding
-            );
+                if ($customMarginInvoiceDetails) {
+                    $page->drawText(
+                        $customerIP, ($this->margin['right'] - $valueRightOffset - $customMarginWidthInvoiceDetails), $this->y, $this->encoding
+                    );
+                }
+                else {
+                    $page->drawText(
+                        $customerIP, ($this->margin['right'] - $valueRightOffset - $this->widthForStringUsingFontSize(
+                                $customerIP, $font, 10
+                            )), $this->y, $this->encoding
+                    );
+                }
             $this->Ln();
             $numberOfLines++;
             }
@@ -512,11 +552,21 @@ abstract class FireGento_Pdf_Model_Engine_Abstract extends Mage_Sales_Model_Orde
             ($this->margin['right'] - $labelRightOffset), $this->y, $this->encoding
         );
         $documentDate = Mage::helper('core')->formatDate($document->getCreatedAtDate(), 'medium', false);
-        $page->drawText(
-            $documentDate,
-            ($this->margin['right'] - $valueRightOffset - $this->widthForStringUsingFontSize($documentDate, $font, 10)),
-            $this->y, $this->encoding
-        );
+        if ($customMarginInvoiceDetails) {
+            $page->drawText(
+                $documentDate,
+                ($this->margin['right'] - $valueRightOffset - $customMarginWidthInvoiceDetails),
+                $this->y, $this->encoding
+            );
+        }
+        else {
+            $page->drawText(
+                $documentDate,
+                ($this->margin['right'] - $valueRightOffset - $this->widthForStringUsingFontSize($documentDate, $font, 10)),
+                $this->y, $this->encoding
+            );
+        }
+
         $this->Ln();
         $numberOfLines++;
 
@@ -533,15 +583,35 @@ abstract class FireGento_Pdf_Model_Engine_Abstract extends Mage_Sales_Model_Orde
             $paymentMethodArray = $this->_prepareText(
                 $order->getPayment()->getMethodInstance()->getTitle(), $page, $font, 10, $width
             );
-            $page->drawText(
-                array_shift($paymentMethodArray), ($this->margin['right'] - $valueRightOffset - $width), $this->y,
-                $this->encoding
-            );
+
+            if ($customMarginInvoiceDetails) {
+                $page->drawText(
+                    array_shift($paymentMethodArray), ($this->margin['right'] - $valueRightOffset - $customMarginWidthInvoiceDetails), $this->y,
+                    $this->encoding
+                );
+            }
+            else {
+                $page->drawText(
+                    array_shift($paymentMethodArray), ($this->margin['right'] - $valueRightOffset - $width), $this->y,
+                    $this->encoding
+                );
+            }
+
             $this->Ln();
             $numberOfLines++;
-            $paymentMethodArray = $this->_prepareText(implode(" ", $paymentMethodArray), $page, $font, 10, 2 * $width);
+            if ($customMarginInvoiceDetails) {
+                $paymentMethodArray = $this->_prepareText(implode(" ", $paymentMethodArray), $page, $font, 10, 2 * ($width - $customMarginWidthInvoiceDetails/2));
+            }
+            else {
+                $paymentMethodArray = $this->_prepareText(implode(" ", $paymentMethodArray), $page, $font, 10, 2 * $width);
+            }
             foreach ($paymentMethodArray as $methodString) {
-                $page->drawText($methodString, $this->margin['right'] - $labelRightOffset, $this->y, $this->encoding);
+                if ($customMarginInvoiceDetails) {
+                    $page->drawText($methodString, $this->margin['right'] - $valueRightOffset - $customMarginWidthInvoiceDetails, $this->y, $this->encoding);
+                }
+                else {
+                    $page->drawText($methodString, $this->margin['right'] - $labelRightOffset, $this->y, $this->encoding);
+                }
                 $this->Ln();
                 $numberOfLines++;
             }
@@ -561,17 +631,39 @@ abstract class FireGento_Pdf_Model_Engine_Abstract extends Mage_Sales_Model_Orde
                 $this->y, $this->encoding
             );
             $shippingMethodArray = $this->_prepareText($order->getShippingDescription(), $page, $font, 10, $width);
-            $page->drawText(
-                array_shift($shippingMethodArray), ($this->margin['right'] - $valueRightOffset - $width), $this->y,
-                $this->encoding
-            );
+            if ($customMarginInvoiceDetails) {
+                $page->drawText(
+                    array_shift($shippingMethodArray), ($this->margin['right'] - $valueRightOffset - $customMarginWidthInvoiceDetails), $this->y,
+                    $this->encoding
+                );
+            }
+            else {
+                $page->drawText(
+                    array_shift($shippingMethodArray), ($this->margin['right'] - $valueRightOffset - $width), $this->y,
+                    $this->encoding
+                );
+            }
+
             $this->Ln();
             $numberOfLines++;
-            $shippingMethodArray = $this->_prepareText(
-                implode(" ", $shippingMethodArray), $page, $font, 10, 2 * $width
-            );
+            if ($customMarginInvoiceDetails) {
+                $shippingMethodArray = $this->_prepareText(
+                    implode(" ", $shippingMethodArray), $page, $font, 10, (2 * $width - $customMarginWidthInvoiceDetails/2)
+                );
+            }
+            else {
+                $shippingMethodArray = $this->_prepareText(
+                    implode(" ", $shippingMethodArray), $page, $font, 10, 2 * $width
+                );
+            }
+
             foreach ($shippingMethodArray as $methodString) {
-                $page->drawText($methodString, $this->margin['right'] - $labelRightOffset, $this->y, $this->encoding);
+                if ($customMarginInvoiceDetails) {
+                    $page->drawText($methodString, $this->margin['right'] - $valueRightOffset - $customMarginWidthInvoiceDetails, $this->y, $this->encoding);
+                }
+                else {
+                    $page->drawText($methodString, $this->margin['right'] - $labelRightOffset, $this->y, $this->encoding);
+                }
                 $this->Ln();
                 $numberOfLines++;
             }
@@ -981,7 +1073,9 @@ abstract class FireGento_Pdf_Model_Engine_Abstract extends Mage_Sales_Model_Orde
             }
         }
         if (array_key_exists('street', $this->_imprint)) {
-            $address .= $this->_imprint['street'] . "\n";
+            foreach ($this->_prepareText($this->_imprint['street'], $page, $font, $fontSize, 90) as $street) {
+                $address .= $street . "\n";
+            }
         }
         if (array_key_exists('zip', $this->_imprint)) {
             $address .= $this->_imprint['zip'] . " ";
