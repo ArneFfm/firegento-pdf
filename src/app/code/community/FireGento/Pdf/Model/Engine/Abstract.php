@@ -838,6 +838,9 @@ abstract class FireGento_Pdf_Model_Engine_Abstract extends Mage_Sales_Model_Orde
                 // see https://github.com/firegento/firegento-pdf/issues/106
                 $uniqueTotalsForDisplay = array_map('unserialize', array_unique(array_map('serialize', $total->getTotalsForDisplay())));
                 foreach ($uniqueTotalsForDisplay as $totalData) {
+                    if ($totalData['label'] == Mage::helper('firegento_pdf')->__('Tax:') && Mage::getStoreConfig('tax/sales_display/show_tax_rate')) {
+                        $totalData['label'] = Mage::helper('firegento_pdf')->__('Tax:') . ' (' . Mage::helper('firegento_pdf')->getTaxRate($order) . '%)';
+                    }
                     $lineBlock['lines'][] = array(
                         array(
                             'text'      => $totalData['label'],

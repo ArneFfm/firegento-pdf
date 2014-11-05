@@ -144,4 +144,24 @@ class FireGento_Pdf_Helper_Data extends Mage_Core_Helper_Abstract
 
         return array($width, $height);
     }
+
+    public function getTaxRate($order)
+    {
+        $taxrate = 0;
+        $_fullInfo = $order->getFullTaxInfo();
+        if ($_fullInfo) {
+            foreach ($_fullInfo as $info) {
+                if (isset($info['hidden']) && $info['hidden']) {
+                    continue;
+                }
+                $rates = $info['rates'];
+                foreach ($rates as $rate) {
+                    if (!is_null($rate['percent'])) {
+                        $taxrate = (float)$rate['percent'];
+                    }
+                }
+            }
+        }
+        return $taxrate;
+    }
 }
