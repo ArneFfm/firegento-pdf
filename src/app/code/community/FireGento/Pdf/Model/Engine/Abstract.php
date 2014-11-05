@@ -882,6 +882,7 @@ abstract class FireGento_Pdf_Model_Engine_Abstract extends Mage_Sales_Model_Orde
         $notes = array();
         $result = new Varien_Object();
         $result->setNotes($notes);
+
         Mage::dispatchEvent(
             'firegento_pdf_' . $this->getMode() . '_insert_note',
             array('order' => $order, $this->getMode() => $model, 'result' => $result)
